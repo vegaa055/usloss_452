@@ -55,7 +55,7 @@ void startup()
    /* Initialize the Ready list, etc. */
    if (DEBUG && debugflag)
       console("startup(): initializing the Ready & Blocked lists\n");
-   ReadyList = NULL;
+   //ReadyList = NULL;
 
    /* Initialize the clock interrupt handler */
 
