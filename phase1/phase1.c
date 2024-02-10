@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <phase1.h>
 #include "kernel.h"
+#include "usloss.h"
 
 /* ------------------------- Prototypes ----------------------------------- */
 int sentinel (void *);
