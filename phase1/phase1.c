@@ -12,12 +12,13 @@
 #include "usloss.h"
 
 /* ------------------------- Prototypes ----------------------------------- */
-int sentinel (void *);
+int sentinel (char *);
 extern int start1 (char *);
 void dispatcher(void);
 void launch();
 static void enableInterrupts();
 static void check_deadlock();
+int fork1(char *name, int (*f)(char *), char *arg, int stacksize, int priority);
 
 
 /* -------------------------- Globals ------------------------------------- */
@@ -52,6 +53,13 @@ void startup()
    int result; /* value returned by call to fork1() */
 
    /* initialize the process table */
+   if (DEBUG && debugflag)
+      console("startup(): initializing process table\n");
+   
+   for (i = 0; i < MAXPROC; i++) {
+      ProcTable[i].pid = -1;
+   }
+   
 
    /* Initialize the Ready list, etc. */
    if (DEBUG && debugflag)
@@ -119,8 +127,17 @@ int fork1(char *name, int (*f)(char *), char *arg, int stacksize, int priority)
       console("fork1(): creating process %s\n", name);
 
    /* test if in kernel mode; halt if in user mode */
+   if ( (PSR_CURRENT_MODE & psr_get()) == 0 ) {
+      console("fork1(): called while in user mode, by process %d. Halting...\n",
+              Current->pid);
+      halt(1);
+   }
 
    /* Return if stack size is too small */
+   if ( stacksize < USLOSS_MIN_STACK ) {
+      console("fork1(): Stack size is too small.\n");
+      return (-2);
+   }
 
    /* find an empty slot in the process table */
 
